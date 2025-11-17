@@ -109,16 +109,17 @@ async function dev() {
   spawn(
     "node",
     [
-      "--import",
-      "@saessak-kit/loader",
-      "--import",
-      "dynohot",
-      "--enable-source-maps",
+      "--import", "@saessak-kit/loader",
+      "-r", "source-map-support/register",
       entryPoint,
     ],
     {
       cwd: Saessak.projectRootPath,
       stdio: "inherit",
+      env: {
+        ...process.env,
+        NODE_ENV: "development",
+      },
     }
   );
 }

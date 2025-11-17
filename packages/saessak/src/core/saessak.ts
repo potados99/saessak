@@ -42,8 +42,11 @@ class SaessakClass {
     // src/model 디렉토리 아래에 있는 친구들은 동적으로 임포트해서 가져와 쓸 겁니다.
     const modelLoader = new ModuleLoader<Model>(`src/model`);
 
-    // 처음에 한 번은 모두 당겨와줍니다.
-    await modelLoader.load();
+    if (process.env.NODE_ENV === "development") {
+      modelLoader.startWatching();
+    } else {
+      await modelLoader.load();
+    }
 
     app.get("/model/:name", (req, res) => {
       const { name } = req.params;

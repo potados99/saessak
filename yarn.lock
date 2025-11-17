@@ -1466,7 +1466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dynohot@npm:^2.0.0, dynohot@npm:^2.1.1":
+"dynohot@npm:^2.0.0":
   version: 2.1.1
   resolution: "dynohot@npm:2.1.1"
   dependencies:
@@ -2457,7 +2457,6 @@ __metadata:
     "@swc/cli": "npm:^0.7.8"
     "@swc/core": "npm:^1.13.5"
     "@types/source-map-support": "npm:^0"
-    dynohot: "npm:^2.1.1"
     saessak: "workspace:^"
     source-map-support: "npm:^0.5.21"
     typescript: "npm:^5.9.3"
@@ -2837,7 +2836,6 @@ __metadata:
     "@types/express": "npm:^5"
     chalk: "npm:^5.6.2"
     chokidar: "npm:^4.0.3"
-    dynohot: "npm:^2.1.1"
     express: "npm:^5.1.0"
     nodemon: "npm:^3.1.11"
     tsicli: "npm:^1.0.5"
@@ -2846,12 +2844,8 @@ __metadata:
     "@saessak-kit/loader": ^2.1.1
     "@swc/cli": ^0.7.8
     "@swc/core": ^1.13.5
-    dynohot: ^2.1.1
     source-map-support: ^0.5.21
     typescript: ^5.9.3
-  dependenciesMeta:
-    dynohot@2.1.1:
-      unplugged: true
   bin:
     saessak: ./dist/bin/cli.js
   languageName: unknown

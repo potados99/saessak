@@ -4286,7 +4286,6 @@ const RAW_RUNTIME_STATE =
           ["@swc/cli", "virtual:5bcf818473b46abfc3b9acf73b58ae98e22b68b974b709c6dc380a211ffa00b55195dafcda5d7c872bdce532adb8f1bb82e64461e9823e9a72a46bdca70935d2#npm:0.7.9"],\
           ["@swc/core", "virtual:1c5941d659d9e962fba7d37641c6aab370afaacc652146cccda1114d11038295136b7839ec3d5b16faab4a2a03716e8cfc532e55f8400f303dc59e06eb3c24ab#npm:1.15.1"],\
           ["@types/source-map-support", "npm:0.5.10"],\
-          ["dynohot", "npm:2.1.1"],\
           ["myserver", "workspace:packages/myserver"],\
           ["saessak", "virtual:5bcf818473b46abfc3b9acf73b58ae98e22b68b974b709c6dc380a211ffa00b55195dafcda5d7c872bdce532adb8f1bb82e64461e9823e9a72a46bdca70935d2#workspace:packages/saessak"],\
           ["source-map-support", "npm:0.5.21"],\
@@ -4704,7 +4703,6 @@ const RAW_RUNTIME_STATE =
           ["@saessak-kit/loader", "workspace:packages/loader"],\
           ["@swc/cli", "virtual:5bcf818473b46abfc3b9acf73b58ae98e22b68b974b709c6dc380a211ffa00b55195dafcda5d7c872bdce532adb8f1bb82e64461e9823e9a72a46bdca70935d2#npm:0.7.9"],\
           ["@swc/core", "virtual:1c5941d659d9e962fba7d37641c6aab370afaacc652146cccda1114d11038295136b7839ec3d5b16faab4a2a03716e8cfc532e55f8400f303dc59e06eb3c24ab#npm:1.15.1"],\
-          ["@types/dynohot", null],\
           ["@types/express", "npm:5.0.5"],\
           ["@types/saessak-kit__loader", null],\
           ["@types/source-map-support", "npm:0.5.10"],\
@@ -4713,7 +4711,6 @@ const RAW_RUNTIME_STATE =
           ["@types/typescript", null],\
           ["chalk", "npm:5.6.2"],\
           ["chokidar", "npm:4.0.3"],\
-          ["dynohot", "npm:2.1.1"],\
           ["express", "npm:5.1.0"],\
           ["nodemon", "npm:3.1.11"],\
           ["saessak", "virtual:5bcf818473b46abfc3b9acf73b58ae98e22b68b974b709c6dc380a211ffa00b55195dafcda5d7c872bdce532adb8f1bb82e64461e9823e9a72a46bdca70935d2#workspace:packages/saessak"],\
@@ -4725,13 +4722,11 @@ const RAW_RUNTIME_STATE =
           "@saessak-kit/loader",\
           "@swc/cli",\
           "@swc/core",\
-          "@types/dynohot",\
           "@types/saessak-kit__loader",\
           "@types/source-map-support",\
           "@types/swc__cli",\
           "@types/swc__core",\
           "@types/typescript",\
-          "dynohot",\
           "source-map-support",\
           "typescript"\
         ],\
@@ -4745,7 +4740,6 @@ const RAW_RUNTIME_STATE =
           ["@types/express", "npm:5.0.5"],\
           ["chalk", "npm:5.6.2"],\
           ["chokidar", "npm:4.0.3"],\
-          ["dynohot", "npm:2.1.1"],\
           ["express", "npm:5.1.0"],\
           ["nodemon", "npm:3.1.11"],\
           ["saessak", "workspace:packages/saessak"],\
