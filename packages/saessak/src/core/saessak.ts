@@ -46,9 +46,9 @@ class SaessakClass {
 
     if (process.env.NODE_ENV === "development") {
       modelLoader.startWatching();
-    } else {
-      await modelLoader.load();
     }
+
+    await modelLoader.load();
 
     app.get("/dump", async (_, res) => {
       const { dumpViewer } = await import("@saessak-kit/dump-viewer");

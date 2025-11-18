@@ -3,6 +3,7 @@ import { readdir } from "fs/promises";
 import { Saessak } from "./saessak";
 import { watch } from "chokidar";
 import { pathToFileURL } from "url";
+import chalk from "chalk";
 
 /**
  * 주어진 경로에서 모듈을 긁어 import하고, 필요하다면 소스코드의 변경을 감지해 최신으로 유지해주는 친구입니다.
@@ -49,12 +50,15 @@ export default class ModuleLoader<T> {
   }
 
   async startWatching() {
-    const moduleDirPath = path.join(
-      Saessak.projectRootPath, // 절대경로일 것으로 상정합니다.
-      this.moduleDir
-    );
-
-    const watcher = watch(moduleDirPath);
+    const watcher = watch(Saessak.projectRootPath, {
+      ignored: (path, stats) =>
+        (!!stats?.isFile() &&
+          !path.endsWith(".ts") &&
+          !path.endsWith(".json")) ||
+        path.endsWith("src/index.ts"),
+      persistent: true,
+      ignoreInitial: true,
+    });
     watcher.on("all", async (_, filePath) => {
       // 개발 모드에서는 .ts 파일만, 프로덕션에서는 .js 파일만 로드
       const expectedExt =
@@ -63,8 +67,11 @@ export default class ModuleLoader<T> {
         return;
       }
 
-      console.log(`모듈 변경 감지: ${filePath}`);
-      await this.loadModule(pathToFileURL(filePath).href);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log(`${chalk.green("!!!무지성 리로드 트리거!!!")}`);
+      await this.load();
+      // console.log(`모듈 변경 감지: ${filePath}`);
+      // await this.loadModule(pathToFileURL(filePath).href);
     });
   }
 
