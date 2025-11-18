@@ -110,7 +110,7 @@ async function dev() {
     "hot-runner",
     [
       "--node-args=--import=tsx",
-      "--node-args=--import=hot-hook/register",
+      "--node-args=--import=@saessak-kit/hot-hook/register",
       entryPoint,
     ],
     {

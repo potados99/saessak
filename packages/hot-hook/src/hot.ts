@@ -86,7 +86,7 @@ class Hot {
      */
     this.#messageChannel = new MessageChannel()
 
-    register('hot-hook/loader', {
+    register('@saessak-kit/hot-hook/loader', {
       parentURL: import.meta.url,
       transferList: [this.#messageChannel.port2],
       data: {

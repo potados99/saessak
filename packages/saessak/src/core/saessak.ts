@@ -51,7 +51,7 @@ class SaessakClass {
     }
 
     app.get("/dump", async (_, res) => {
-      const { dumpViewer } = await import("@hot-hook/dump-viewer");
+      const { dumpViewer } = await import("@saessak-kit/dump-viewer");
 
       res.header("Content-Type", "text/html; charset=utf-8");
       res.send(await dumpViewer());

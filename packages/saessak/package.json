@@ -17,7 +17,7 @@
   },
   "bin": "./dist/bin/cli.js",
   "devDependencies": {
-    "@hot-hook/dump-viewer": "^0.4.0",
+    "@saessak-kit/dump-viewer": "workspace:^",
     "@swc/cli": "^0.7.8",
     "@types/express": "^5",
     "nodemon": "^3.1.11",
@@ -32,11 +32,11 @@
     "tsicli": "^1.0.5"
   },
   "peerDependencies": {
-    "@hot-hook/runner": "^0.1.0",
+    "@saessak-kit/hot-hook": "^0.4.0",
+    "@saessak-kit/hot-runner": "^0.1.0",
     "@saessak-kit/loader": "^2.1.1",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.13.5",
-    "hot-hook": "^0.4.0",
     "source-map-support": "^0.5.21",
     "typescript": "^5.9.3"
   }
