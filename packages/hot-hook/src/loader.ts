@@ -28,6 +28,7 @@ export class HotHookLoader {
   #dependencyTree: DependencyTree
   #hardcodedBoundaryMatcher!: Matcher
   #dynamicImportChecker!: DynamicImportChecker
+  #resolvedSourcePaths: Map<string, string> = new Map()
 
   constructor(options: InitializeHookOptions) {
     this.#options = options
@@ -251,10 +252,25 @@ export class HotHookLoader {
     }
 
     const resultPath = fileURLToPath(resultUrl)
+    
+    // @saessak-kit/loader는 result.url과 더불어,
+    // result.importAttributes.ts에 실제 소스 파일 경로를 제공합니다.
+    // 만약 result.url이 .js 파일을 가리키더라도, 이는 사실 .ts파일을 swc로 트랜스파일한 것일 수 있습니다.
+    // 이 경우에는 result.importAttributes.ts에 실제 소스 파일(.ts) 경로를 제공합니다.
+    //
+    // 여기에서는 실제 파일의 변경을 감지해야 하므로, 
+    // result.importAttributes.ts가 존재할 경우 이를 사용합니다.
+    const actualSourcePath = result.importAttributes?.ts 
+      ? fileURLToPath(new URL(result.importAttributes.ts as string))
+      : resultPath
+    
+    // 나중에 parent로 사용될 때를 위해 매핑 저장
+    this.#resolvedSourcePaths.set(resultPath, actualSourcePath)
+    
     const isRoot = !parentUrl
     if (isRoot) {
-      this.#dependencyTree.addRoot(resultPath)
-      this.#initialize(resultPath)
+      this.#dependencyTree.addRoot(actualSourcePath)
+      this.#initialize(actualSourcePath)
       return result
     }
 
@@ -267,8 +283,12 @@ export class HotHookLoader {
     if (parentUrl.protocol !== 'file:') return result
 
     const parentPath = fileURLToPath(parentUrl)
-    const isHardcodedBoundary = this.#hardcodedBoundaryMatcher.match(resultPath)
-    const reloadable = context.importAttributes?.hot === 'true' ? true : isHardcodedBoundary
+    
+    // Parent의 실제 소스 경로를 Map에서 조회
+    const actualParentPath = this.#resolvedSourcePaths.get(parentPath) || parentPath
+    
+    const isHardcodedBoundary = this.#hardcodedBoundaryMatcher.match(actualSourcePath)
+    const reloadable = result.importAttributes?.hot === 'true' ? true : isHardcodedBoundary
 
     if (reloadable) {
       /**
@@ -276,11 +296,11 @@ export class HotHookLoader {
        * 그렇지 않으면 hot-hook이 파일을 invalidate할 수 없습니다.
        */
       // 부모도 boundary인지 확인
-      const isParentBoundary = this.#hardcodedBoundaryMatcher.match(parentPath)
+      const isParentBoundary = this.#hardcodedBoundaryMatcher.match(actualParentPath)
       
       const isImportedDynamically =
         await this.#dynamicImportChecker.ensureFileIsImportedDynamicallyFromParent(
-          parentPath,
+          actualParentPath,
           specifier,
         )
 
@@ -292,26 +312,26 @@ export class HotHookLoader {
        * 동적으로 import되지 않았고 옵션이 설정되어 있으면 에러 발생
        */
       if (!effectivelyReloadable && this.#options.throwWhenBoundariesAreNotDynamicallyImported)
-        throw new FileNotImportedDynamicallyException(parentPath, specifier, this.#projectRoot)
+        throw new FileNotImportedDynamicallyException(actualParentPath, specifier, this.#projectRoot)
 
       /**
        * 그렇지 않으면 not-reloadable로 추가 (full reload 트리거)
        */
-      this.#dependencyTree.addDependency(parentPath, {
-        path: resultPath,
+      this.#dependencyTree.addDependency(actualParentPath, {
+        path: actualSourcePath,
         reloadable: effectivelyReloadable,
         isWronglyImported: !effectivelyReloadable,
       })
     } else {
-      this.#dependencyTree.addDependency(parentPath, { path: resultPath, reloadable })
+      this.#dependencyTree.addDependency(actualParentPath, { path: actualSourcePath, reloadable })
     }
 
-    if (this.#pathIgnoredMatcher.match(resultPath)) {
+    if (this.#pathIgnoredMatcher.match(actualSourcePath)) {
       return result
     }
 
-    this.#watcher.add(resultPath)
-    const version = this.#dependencyTree.getVersion(resultPath).toString()
+    this.#watcher.add(actualSourcePath)
+    const version = this.#dependencyTree.getVersion(actualSourcePath).toString()
     resultUrl.searchParams.set('hot-hook', version)
 
     debug('Resolving %s with version %s', resultPath, version)

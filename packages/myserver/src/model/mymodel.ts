@@ -11,5 +11,3 @@ export default {
         return `안녕하세요! mymodel입니다. 여기에서는 다른 모델인 libmodel을 사용합니다.<br>libmodel: ${libmodel.run()}`;
     }, // 여기 수정하시고 http://localhost:8080/model/mymodel 들어와보십셔.
 } as Model;
-
-
