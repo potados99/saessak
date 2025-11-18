@@ -15,7 +15,6 @@
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
-    "@saessak-kit/dump-viewer": "workspace:^",
     "@saessak-kit/hot-hook": "workspace:^",
     "@saessak-kit/hot-runner": "workspace:^",
     "@saessak-kit/loader": "workspace:^",
