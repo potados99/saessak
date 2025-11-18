@@ -1,3 +1,3 @@
 export type Model = {
-    run: () => string;
+    run: () => string | Promise<string>;
 }

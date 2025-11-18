@@ -72,9 +72,7 @@ export default class ModuleLoader<T> {
     console.log(`모듈을 임포트합니다: ${moduleUrlString}`);
 
     /** @ts-ignore */
-    console.log(`import.meta.hot?.boundary: ${JSON.stringify(import.meta.hot?.boundary)}`);
-    /** @ts-ignore */
-    const module: T = (await import(moduleUrlString, import.meta.hot?.boundary)).default;
+    const module: T = (await import(moduleUrlString)).default;
     const moduleName = path.basename(moduleUrlString).replace(/\.[^/.]+$/, "");
 
     this.modules[moduleName] = module;

@@ -15,16 +15,22 @@
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
+    "@hot-hook/dump-viewer": "^0.4.0",
+    "@hot-hook/runner": "^0.1.0",
     "@saessak-kit/loader": "workspace:^",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.13.5",
     "@types/source-map-support": "^0",
     "hot-hook": "^0.4.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
   "hotHook": {
     "boundaries": [
-      "./src/**/*.ts"
+      "./src/model/**/*.ts"
     ]
+  },
+  "resolutions": {
+    "hot-hook": "workspace:^"
   }
 }

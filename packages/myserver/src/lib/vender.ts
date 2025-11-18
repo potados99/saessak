@@ -1,5 +1,7 @@
-console.log(`vender.ts evaluated: ${new Date().toISOString()}`);
+const evaluated = new Date().toISOString();
+console.log(`vender.ts evaluated: ${evaluated}`);
 
 export default function vender(): string {
-  return `Hello from vender.ts`;
+  return `Hello from vender.ts!! ${evaluated}`;
 }
+

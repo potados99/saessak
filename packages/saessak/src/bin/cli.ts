@@ -107,11 +107,10 @@ async function dev() {
   console.log(`다음 파일을 실행합니다: ${entryPoint}`);
 
   spawn(
-    "node",
+    "hot-runner",
     [
-      "--import", "tsx",
-      "--import", "hot-hook/register",
-      "-r", "source-map-support/register",
+      "--node-args=--import=tsx",
+      "--node-args=--import=hot-hook/register",
       entryPoint,
     ],
     {

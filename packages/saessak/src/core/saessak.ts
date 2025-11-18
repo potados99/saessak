@@ -13,7 +13,9 @@ class SaessakClass {
 
   private _projectRootPath: string | null = null;
   set projectRootPath(projectRootPath: string) {
-    console.log(chalk.blue(`프로젝트 루트 경로가 설정되었습니다: ${projectRootPath}`));
+    console.log(
+      chalk.blue(`프로젝트 루트 경로가 설정되었습니다: ${projectRootPath}`)
+    );
     this._projectRootPath = projectRootPath;
   }
   get projectRootPath(): string {
@@ -22,7 +24,7 @@ class SaessakClass {
     }
     return this._projectRootPath!;
   }
-  
+
   /**
    * Saessak을 초기화합니다.
    */
@@ -38,7 +40,7 @@ class SaessakClass {
    */
   async createServer(port: number = 8080) {
     const app = express();
-    
+
     // src/model 디렉토리 아래에 있는 친구들은 동적으로 임포트해서 가져와 쓸 겁니다.
     const modelLoader = new ModuleLoader<Model>(`src/model`);
 
@@ -48,12 +50,20 @@ class SaessakClass {
       await modelLoader.load();
     }
 
-    app.get("/model/:name", (req, res) => {
+    app.get("/dump", async (_, res) => {
+      const { dumpViewer } = await import("@hot-hook/dump-viewer");
+
+      res.header("Content-Type", "text/html; charset=utf-8");
+      res.send(await dumpViewer());
+      res.end();
+    });
+
+    app.get("/model/:name", async (req, res) => {
       const { name } = req.params;
 
       // 요청이 오면 당겨놓은 모델을 불러와 처리합니다.
       const model = modelLoader.findModule(name);
-      const result = model?.run();
+      const result = await model?.run();
 
       // 물론 없을 수도 있어요.
       res.send(result ?? `Model '${name}' not found.`);

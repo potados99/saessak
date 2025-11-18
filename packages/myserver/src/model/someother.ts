@@ -1,6 +1,11 @@
 import { Model } from "saessak";
-import vender from "../lib/vender";
 
 export default {
-    run: () => `some other model: ${vender()}`
+    run: async () => {
+        const vender = (await import("../lib/vender")).default;
+        const tools = (await import("../lib/tools")).default;
+
+        return `some other model. vender: ${vender()}, tools: ${tools()}`;
+    },
 } as Model;
+
