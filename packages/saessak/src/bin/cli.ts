@@ -109,6 +109,7 @@ async function dev() {
   spawn(
     "hot-runner",
     [
+      "--clear-screen=false",
       "--node-args=--import=@saessak-kit/loader",
       "--node-args=--import=@saessak-kit/hot-hook/register",
       entryPoint,

@@ -5,6 +5,8 @@ export type MessageChannelMessage =
   | { type: 'hot-hook:full-reload'; path: string; shouldBeReloadable?: boolean }
   | { type: 'hot-hook:invalidated'; paths: string[] }
   | { type: 'hot-hook:file-changed'; path: string; action: FileChangeAction }
+  | { type: 'hot-hook:manual-invalidate'; path: string; action: FileChangeAction }
+  | { type: 'hot-hook:manual-invalidate-done'; path: string; invalidatedPaths: string[] }
 
 export type MessageChannelPerType = {
   [K in MessageChannelMessage['type']]: Omit<Extract<MessageChannelMessage, { type: K }>, 'type'>
@@ -69,6 +71,14 @@ export interface InitOptions {
    * imported.
    */
   throwWhenBoundariesAreNotDynamicallyImported?: boolean
+
+  /**
+   * If false, hot-hook will create its own file watcher.
+   * By default, you must manually notify file changes using hot.invalidateFile().
+   * 
+   * @default undefined (watcher disabled)
+   */
+  disableAutoWatch?: boolean
 }
 
 export type InitializeHookOptions = Pick<
@@ -80,6 +90,7 @@ export type InitializeHookOptions = Pick<
   | 'include'
   | 'restart'
   | 'throwWhenBoundariesAreNotDynamicallyImported'
+  | 'disableAutoWatch'
 > & {
   /**
    * The message port to communicate with the parent thread.

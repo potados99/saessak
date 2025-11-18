@@ -4,6 +4,7 @@ import { Saessak } from "./saessak";
 import { watch } from "chokidar";
 import { pathToFileURL } from "url";
 import chalk from "chalk";
+import { hot } from "@saessak-kit/hot-hook";
 
 /**
  * 주어진 경로에서 모듈을 긁어 import하고, 필요하다면 소스코드의 변경을 감지해 최신으로 유지해주는 친구입니다.
@@ -59,7 +60,11 @@ export default class ModuleLoader<T> {
       persistent: true,
       ignoreInitial: true,
     });
-    watcher.on("all", async (_, filePath) => {
+    watcher.on("all", async (action, filePath) => {
+      if (action !== "change" && action !== "add" && action !== "unlink") {
+        return;
+      }
+
       // 개발 모드에서는 .ts 파일만, 프로덕션에서는 .js 파일만 로드
       const expectedExt =
         process.env.NODE_ENV === "development" ? ".ts" : ".js";
@@ -67,16 +72,20 @@ export default class ModuleLoader<T> {
         return;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log(`${chalk.green("!!!무지성 리로드 트리거!!!")}`);
+      // 무언가 엄청난 일들... 코드젠이라든가...
+
+      console.log(`${chalk.yellow("파일 변경 감지: ")}${filePath}`);
+      const invalidatedPaths = await hot.invalidateFile(filePath, action);
+      console.log(`${chalk.yellow("영향 받은 파일(들) 경로:")}\n${invalidatedPaths.map(path => `- ${path}`).join("\n")}`);
       await this.load();
+      console.log(`${chalk.green("모듈들을 다시 로드하였습니다.")}`);
       // console.log(`모듈 변경 감지: ${filePath}`);
       // await this.loadModule(pathToFileURL(filePath).href);
     });
   }
 
   private async loadModule(moduleUrlString: string) {
-    console.log(`모듈을 임포트합니다: ${moduleUrlString}`);
+    // console.log(`모듈을 임포트합니다: ${moduleUrlString}`);
 
     /** @ts-ignore */
     const module: T = (await import(moduleUrlString)).default;

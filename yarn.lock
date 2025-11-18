@@ -9387,6 +9387,7 @@ __metadata:
   resolution: "saessak@workspace:packages/saessak"
   dependencies:
     "@saessak-kit/dump-viewer": "workspace:^"
+    "@saessak-kit/hot-hook": "workspace:^"
     "@swc/cli": "npm:^0.7.8"
     "@swc/core": "npm:^1.13.5"
     "@types/express": "npm:^5"

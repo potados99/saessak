@@ -52,7 +52,11 @@ export class HotHookLoader {
     this.#pathIncludedMatcher = new Matcher(this.#projectRoot, this.#options.include || [])
     this.#hardcodedBoundaryMatcher = new Matcher(this.#projectRoot, this.#options.boundaries)
 
-    this.#watcher = this.#createWatcher()
+    // 기본적으로 watcher를 생성하지 않음
+    // disableAutoWatch가 명시적으로 false인 경우에만 watcher 생성
+    if (this.#options.disableAutoWatch === false) {
+      this.#watcher = this.#createWatcher()
+    }
   }
 
   /**
@@ -74,15 +78,30 @@ export class HotHookLoader {
   /**
    * When a message is received from the main thread
    */
-  #onMessage(message: any) {
-    if (message.type !== 'hot-hook:dump') return
-    this.#messagePort?.postMessage({ type: 'hot-hook:dump', dump: this.#dependencyTree.dump() })
+  async #onMessage(message: any) {
+    if (message.type === 'hot-hook:dump') {
+      return this.#messagePort?.postMessage({ type: 'hot-hook:dump', dump: this.#dependencyTree.dump() })
+    }
+
+    if (message.type === 'hot-hook:manual-invalidate') {
+      // 파일이 변경되었다고 직접 알려주는 메시지입니다. 처리하면 됩니다.
+      // 이 호출이 이 hot-hook의 핵심 tick입니다.
+      const invalidatedPaths = await this.#onFileChange(message.path, message.action);
+
+      // 처리 완료 알림을 보내줍니다.
+      return this.#messagePort?.postMessage({
+        type: 'hot-hook:manual-invalidate-done',
+        path: message.path,
+        invalidatedPaths: invalidatedPaths || [],
+      })
+    }
   }
 
   /**
    * When a file changes, invalidate it and its dependents.
+   * @returns Array of invalidated file paths (empty if full reload needed)
    */
-  async #onFileChange(relativeFilePath: string, action: FileChangeAction) {
+  async #onFileChange(relativeFilePath: string, action: FileChangeAction): Promise<string[]> {
     debug('File change %s', { relativeFilePath, action })
     const filePath = pathResolve(relativeFilePath)
 
@@ -92,10 +111,11 @@ export class HotHookLoader {
      */
     if (action === 'unlink') {
       debug('File removed %s', filePath)
-      this.#watcher.unwatch(filePath)
+      this.#watcher?.unwatch(filePath)
       this.#postMessage('hot-hook:file-changed', { path: filePath, action: 'unlink' })
 
-      return this.#dependencyTree.remove(filePath)
+      this.#dependencyTree.remove(filePath)
+      return []
     }
 
     /**
@@ -105,8 +125,9 @@ export class HotHookLoader {
     const fileExists = await this.#checkIfFileExists(filePath)
     if (!fileExists) {
       debug('File does not exist anymore %s', filePath)
-      this.#watcher.unwatch(filePath)
-      return this.#dependencyTree.remove(filePath)
+      this.#watcher?.unwatch(filePath)
+      this.#dependencyTree.remove(filePath)
+      return []
     }
 
     /**
@@ -121,7 +142,8 @@ export class HotHookLoader {
     const realFilePath = await realpath(filePath)
     if (this.#reloadMatcher.match(realFilePath)) {
       debug('Full reload (hardcoded `restart` file) %s', realFilePath)
-      return this.#postMessage('hot-hook:full-reload', { path: realFilePath })
+      this.#postMessage('hot-hook:full-reload', { path: realFilePath })
+      return []
     }
 
     /**
@@ -130,7 +152,8 @@ export class HotHookLoader {
      */
     if (!this.#dependencyTree.isInside(realFilePath)) {
       debug('File not in dependency tree, sending file-changed message %s', realFilePath)
-      return this.#postMessage('hot-hook:file-changed', { path: realFilePath, action })
+      this.#postMessage('hot-hook:file-changed', { path: realFilePath, action })
+      return []
     }
 
     /**
@@ -140,7 +163,8 @@ export class HotHookLoader {
     const { reloadable, shouldBeReloadable } = this.#dependencyTree.isReloadable(realFilePath)
     if (!reloadable) {
       debug('Full reload (not-reloadable file) %s', realFilePath)
-      return this.#postMessage('hot-hook:full-reload', { path: realFilePath, shouldBeReloadable })
+      this.#postMessage('hot-hook:full-reload', { path: realFilePath, shouldBeReloadable })
+      return []
     }
 
     /**
@@ -148,7 +172,9 @@ export class HotHookLoader {
      */
     const invalidatedFiles = this.#dependencyTree.invalidateFileAndDependents(realFilePath)
     debug('Invalidating %s', Array.from(invalidatedFiles).join(', '))
-    this.#postMessage('hot-hook:invalidated', { paths: [...invalidatedFiles] })
+    const invalidatedPaths = [...invalidatedFiles]
+    this.#postMessage('hot-hook:invalidated', { paths: invalidatedPaths })
+    return invalidatedPaths
   }
 
   /**
@@ -330,7 +356,8 @@ export class HotHookLoader {
       return result
     }
 
-    this.#watcher.add(actualSourcePath)
+    // 워쳐는 이제 밖에 있기 때문에 주석 처리 하였습니다.
+    // this.#watcher.add(actualSourcePath)
     const version = this.#dependencyTree.getVersion(actualSourcePath).toString()
     resultUrl.searchParams.set('hot-hook', version)
 

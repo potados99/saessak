@@ -15165,6 +15165,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/saessak/",\
         "packageDependencies": [\
           ["@saessak-kit/dump-viewer", "virtual:5bcf818473b46abfc3b9acf73b58ae98e22b68b974b709c6dc380a211ffa00b55195dafcda5d7c872bdce532adb8f1bb82e64461e9823e9a72a46bdca70935d2#workspace:packages/dump-viewer"],\
+          ["@saessak-kit/hot-hook", "workspace:packages/hot-hook"],\
           ["@swc/cli", "virtual:ece71cee498aa3e1ed9f332bfa5505b1ab1473c4714bfe0b5e15a0788cec93e288f7e9e557202e796f8c33d49cdf82b5df901d6a61a255658c75400231a2931c#npm:0.7.9"],\
           ["@swc/core", "virtual:ab32b225a024d1fcbdb3456f040eefea1715a83fd8415be917555022843783563b916e57848611f7709fcfecd3b7c89a82a6213e75f3942f3b7ae860b4493acf#npm:1.15.2"],\
           ["@types/express", "npm:5.0.5"],\
