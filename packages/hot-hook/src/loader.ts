@@ -272,28 +272,35 @@ export class HotHookLoader {
 
     if (reloadable) {
       /**
-       * If supposed to be reloadable, we must ensure it is imported dynamically
-       * from the parent file. Otherwise, hot-hook can't invalidate the file
+       * 이 파일이 reloadable하려면 부모 파일로부터 동적으로 import되어야 합니다.
+       * 그렇지 않으면 hot-hook이 파일을 invalidate할 수 없습니다.
        */
+      // 부모도 boundary인지 확인
+      const isParentBoundary = this.#hardcodedBoundaryMatcher.match(parentPath)
+      
       const isImportedDynamically =
         await this.#dynamicImportChecker.ensureFileIsImportedDynamicallyFromParent(
           parentPath,
           specifier,
         )
 
+      // 부모도 boundary면 정적 import 허용
+      // 왜냐하면 부모 boundary가 reload될 때 자식도 함께 새로 로드되기 때문
+      const effectivelyReloadable = isImportedDynamically || isParentBoundary
+
       /**
-       * Throw an error if not dynamically imported and the option is set
+       * 동적으로 import되지 않았고 옵션이 설정되어 있으면 에러 발생
        */
-      if (!isImportedDynamically && this.#options.throwWhenBoundariesAreNotDynamicallyImported)
+      if (!effectivelyReloadable && this.#options.throwWhenBoundariesAreNotDynamicallyImported)
         throw new FileNotImportedDynamicallyException(parentPath, specifier, this.#projectRoot)
 
       /**
-       * Otherwise, just add the file as not-reloadable ( so it will trigger a full reload )
+       * 그렇지 않으면 not-reloadable로 추가 (full reload 트리거)
        */
       this.#dependencyTree.addDependency(parentPath, {
         path: resultPath,
-        reloadable: isImportedDynamically,
-        isWronglyImported: !isImportedDynamically,
+        reloadable: effectivelyReloadable,
+        isWronglyImported: !effectivelyReloadable,
       })
     } else {
       this.#dependencyTree.addDependency(parentPath, { path: resultPath, reloadable })
