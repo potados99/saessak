@@ -109,7 +109,8 @@ async function dev() {
   spawn(
     "node",
     [
-      "--import", "@saessak-kit/loader",
+      "--import", "tsx",
+      "--import", "hot-hook/register",
       "-r", "source-map-support/register",
       entryPoint,
     ],

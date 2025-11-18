@@ -55,7 +55,7 @@ export default class ModuleLoader<T> {
     );
 
     const watcher = watch(moduleDirPath);
-    watcher.on("all", async (_, filePath) => {      
+    watcher.on("all", async (_, filePath) => {
       // 개발 모드에서는 .ts 파일만, 프로덕션에서는 .js 파일만 로드
       const expectedExt =
         process.env.NODE_ENV === "development" ? ".ts" : ".js";
@@ -71,8 +71,10 @@ export default class ModuleLoader<T> {
   private async loadModule(moduleUrlString: string) {
     console.log(`모듈을 임포트합니다: ${moduleUrlString}`);
 
-    const module: T = (await import(`${moduleUrlString}?hot=${Date.now()}`))
-      .default;
+    /** @ts-ignore */
+    console.log(`import.meta.hot?.boundary: ${JSON.stringify(import.meta.hot?.boundary)}`);
+    /** @ts-ignore */
+    const module: T = (await import(moduleUrlString, import.meta.hot?.boundary)).default;
     const moduleName = path.basename(moduleUrlString).replace(/\.[^/.]+$/, "");
 
     this.modules[moduleName] = module;
